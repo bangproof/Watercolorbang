@@ -82,9 +82,13 @@ fetch("gallery.json")
     });
 
     // Pinch-to-zoom and drag-to-pan the image itself, plus a
-    // single-finger swipe to move between paintings when not zoomed
-    // in — all handled on the stage so the rest of the page never
-    // responds to these gestures.
+    // single-finger swipe to move between paintings — either at 1x,
+    // or by dragging past the edge of a panned/zoomed image (like
+    // Photos) — all handled on the stage so the rest of the page
+    // never responds to these gestures.
+    const SWIPE_THRESHOLD = 50;
+    const OVERSCROLL_THRESHOLD = 60;
+
     let pinchStartDistance = 0;
     let scaleAtPinchStart = 1;
     let panStartX = 0;
@@ -93,6 +97,8 @@ fetch("gallery.json")
     let touchStartY = 0;
     let isPinching = false;
     let isPanning = false;
+    let overscrollX = 0;
+    let lastDeltaY = 0;
 
     function touchDistance(touches) {
       const dx = touches[0].clientX - touches[1].clientX;
@@ -146,14 +152,12 @@ fetch("gallery.json")
         } else if (isPanning && event.touches.length === 1) {
           event.preventDefault();
           const limit = maxPan();
-          translateX = clamp(
-            panStartX + (event.touches[0].clientX - touchStartX),
-            limit.x
-          );
-          translateY = clamp(
-            panStartY + (event.touches[0].clientY - touchStartY),
-            limit.y
-          );
+          const rawX = panStartX + (event.touches[0].clientX - touchStartX);
+          const rawY = panStartY + (event.touches[0].clientY - touchStartY);
+          translateX = clamp(rawX, limit.x);
+          translateY = clamp(rawY, limit.y);
+          overscrollX = rawX - translateX;
+          lastDeltaY = rawY - panStartY;
           applyTransform();
         }
       },
@@ -167,6 +171,14 @@ fetch("gallery.json")
       }
       if (isPanning) {
         isPanning = false;
+        if (
+          Math.abs(overscrollX) > OVERSCROLL_THRESHOLD &&
+          Math.abs(overscrollX) > Math.abs(lastDeltaY)
+        ) {
+          if (overscrollX < 0) showNext();
+          else showPrev();
+        }
+        overscrollX = 0;
         return;
       }
       if (scale > 1) return;
@@ -175,7 +187,7 @@ fetch("gallery.json")
       const deltaX = touch.clientX - touchStartX;
       const deltaY = touch.clientY - touchStartY;
 
-      if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (Math.abs(deltaX) > SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY)) {
         if (deltaX < 0) showNext();
         else showPrev();
       }
