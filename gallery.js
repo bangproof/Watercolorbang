@@ -156,7 +156,12 @@ fetch("gallery.json")
           const rawY = panStartY + (event.touches[0].clientY - touchStartY);
           translateX = clamp(rawX, limit.x);
           translateY = clamp(rawY, limit.y);
-          overscrollX = rawX - translateX;
+          // Only count drag-past-the-edge as an overscroll when the
+          // image actually has horizontal pan room — otherwise (e.g.
+          // a portrait image with no horizontal slack) any sideways
+          // jitter during a vertical pan would read as a full-force
+          // overscroll and fire an unintended navigation.
+          overscrollX = limit.x > 0 ? rawX - translateX : 0;
           lastDeltaY = rawY - panStartY;
           applyTransform();
         }
