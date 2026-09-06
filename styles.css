@@ -85,6 +85,7 @@ html, body {
   display: block;
   width: 100%;
   height: auto;
+  border: 1px solid #ffffff;
   border-radius: 2px;
 }
 
@@ -158,6 +159,7 @@ html, body {
   display: block;
   max-width: 100%;
   max-height: 100%;
+  border: 1px solid #ffffff;
   border-radius: 2px;
   transform-origin: center;
   touch-action: none;
