@@ -103,9 +103,16 @@ html, body {
 
 .footer {
   padding: 8px 16px max(env(safe-area-inset-bottom), 16px);
-  font-size: 0.7rem;
   color: var(--muted);
   text-align: center;
+}
+
+.footer p {
+  font-size: 0.7rem;
+}
+
+.footer__copyright {
+  margin-bottom: 2px;
 }
 
 @media (min-width: 640px) {
