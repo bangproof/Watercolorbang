@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Stamp deploy time
         run: |
-          sed -i "s/__BUILD_TIME__/$(date -u +'%Y-%m-%d %H:%M UTC')/" index.html
+          sed -i "s/__BUILD_TIME__/$(TZ='America/New_York' date +'%Y-%m-%d %H:%M %Z')/" index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
