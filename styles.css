@@ -57,13 +57,52 @@ html, body {
 }
 
 .content {
-  padding: 40px 20px;
-  max-width: 430px;
+  padding: 24px 16px 40px;
+  max-width: 720px;
   margin: 0 auto;
 }
 
-.content__placeholder {
+.gallery__grid {
+  columns: 2;
+  column-gap: 10px;
+}
+
+.gallery__figure {
+  break-inside: avoid;
+  margin: 0 0 10px;
+}
+
+.gallery__link {
+  display: block;
+}
+
+.gallery__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+}
+
+.gallery__caption {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.gallery__empty {
+  padding: 32px 0;
   font-size: 0.9rem;
   color: var(--muted);
   text-align: center;
+}
+
+@media (min-width: 640px) {
+  .gallery__grid {
+    columns: 3;
+    column-gap: 14px;
+  }
+
+  .gallery__figure {
+    margin-bottom: 14px;
+  }
 }
