@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>watercolorbang</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,9 @@
 
   <div class="lightbox" id="lightbox" hidden>
     <button class="lightbox__close" id="lightbox-close" aria-label="Close">&times;</button>
-    <img class="lightbox__image" id="lightbox-image" alt="">
+    <div class="lightbox__stage" id="lightbox-stage">
+      <img class="lightbox__image" id="lightbox-image" alt="">
+    </div>
     <p class="lightbox__caption" id="lightbox-caption"></p>
   </div>
 

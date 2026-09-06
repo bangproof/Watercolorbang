@@ -129,15 +129,28 @@ html, body {
   display: none;
 }
 
+.lightbox__stage {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: none;
+}
+
 .lightbox__image {
   display: block;
   max-width: 100%;
-  max-height: 80vh;
+  max-height: 100%;
   border-radius: 2px;
+  transform-origin: center;
+  touch-action: none;
 }
 
 .lightbox__caption {
-  color: var(--text-inverse);
+  color: #ffffff;
   font-size: 0.85rem;
   text-align: center;
 }
