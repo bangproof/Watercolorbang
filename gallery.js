@@ -22,10 +22,9 @@ fetch("gallery.json")
     let translateX = 0;
     let translateY = 0;
 
-    // Reads Title/Creator/Description straight out of a JPEG's
-    // embedded XMP metadata (e.g. Photoshop's File Info fields), so
-    // paintings need no manual captioning in gallery.json unless you
-    // want to override what's in the file. Only the first ~128KB is
+    // Reads the Description field straight out of a JPEG's embedded
+    // XMP metadata (Photoshop's File Info dialog), shown below the
+    // manual title/year from gallery.json. Only the first ~128KB is
     // fetched (via a Range request) since XMP always lives near the
     // start of the file, well before the compressed image data.
     const metadataCache = new Map();
@@ -53,11 +52,7 @@ fetch("gallery.json")
           if (start === -1 || end === -1) return {};
           const xmpXml = text.slice(start, end + "</x:xmpmeta>".length);
           const doc = new DOMParser().parseFromString(xmpXml, "application/xml");
-          return {
-            title: readXmpField(doc, "title"),
-            creator: readXmpField(doc, "creator"),
-            description: readXmpField(doc, "description"),
-          };
+          return { description: readXmpField(doc, "description") };
         })
         .catch(() => ({}));
       metadataCache.set(file, promise);
@@ -65,11 +60,17 @@ fetch("gallery.json")
     }
 
     function updateCaption(painting, meta) {
-      const title = painting.title || meta.title || "";
       const lines = [];
-      if (title) lines.push(painting.year ? `${title}, ${painting.year}` : title);
-      if (meta.creator) lines.push(meta.creator);
-      if (meta.description) lines.push(meta.description);
+      if (painting.title) {
+        lines.push(painting.year ? `${painting.title}, ${painting.year}` : painting.title);
+      }
+      if (meta.description) {
+        meta.description
+          .split("\n")
+          .map((line) => line.trim())
+          .filter(Boolean)
+          .forEach((line) => lines.push(line));
+      }
 
       lightboxCaption.textContent = "";
       lines.forEach((line, i) => {
