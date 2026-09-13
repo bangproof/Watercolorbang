@@ -17,9 +17,67 @@ fetch("gallery.json")
     }
 
     let currentIndex = 0;
+    let renderRequestId = 0;
     let scale = 1;
     let translateX = 0;
     let translateY = 0;
+
+    // Reads Title/Creator/Description straight out of a JPEG's
+    // embedded XMP metadata (e.g. Photoshop's File Info fields), so
+    // paintings need no manual captioning in gallery.json unless you
+    // want to override what's in the file. Only the first ~128KB is
+    // fetched (via a Range request) since XMP always lives near the
+    // start of the file, well before the compressed image data.
+    const metadataCache = new Map();
+
+    function readXmpField(doc, tagName) {
+      const dc = "http://purl.org/dc/elements/1.1/";
+      const rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+      const containers = doc.getElementsByTagNameNS(dc, tagName);
+      if (!containers.length) return "";
+      const items = containers[0].getElementsByTagNameNS(rdf, "li");
+      return Array.from(items)
+        .map((li) => li.textContent.trim())
+        .filter(Boolean)
+        .join(", ");
+    }
+
+    async function fetchEmbeddedMetadata(file) {
+      if (metadataCache.has(file)) return metadataCache.get(file);
+      const promise = fetch(file, { headers: { Range: "bytes=0-131071" } })
+        .then((response) => response.arrayBuffer())
+        .then((buffer) => {
+          const text = new TextDecoder("utf-8", { fatal: false }).decode(buffer);
+          const start = text.indexOf("<x:xmpmeta");
+          const end = text.indexOf("</x:xmpmeta>");
+          if (start === -1 || end === -1) return {};
+          const xmpXml = text.slice(start, end + "</x:xmpmeta>".length);
+          const doc = new DOMParser().parseFromString(xmpXml, "application/xml");
+          return {
+            title: readXmpField(doc, "title"),
+            creator: readXmpField(doc, "creator"),
+            description: readXmpField(doc, "description"),
+          };
+        })
+        .catch(() => ({}));
+      metadataCache.set(file, promise);
+      return promise;
+    }
+
+    function updateCaption(painting, meta) {
+      const title = painting.title || meta.title || "";
+      const lines = [];
+      if (title) lines.push(painting.year ? `${title}, ${painting.year}` : title);
+      if (meta.creator) lines.push(meta.creator);
+      if (meta.description) lines.push(meta.description);
+
+      lightboxCaption.textContent = "";
+      lines.forEach((line, i) => {
+        if (i > 0) lightboxCaption.appendChild(document.createElement("br"));
+        lightboxCaption.appendChild(document.createTextNode(line));
+      });
+      lightboxCaption.hidden = lines.length === 0;
+    }
 
     function applyTransform() {
       lightboxImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
@@ -43,14 +101,16 @@ fetch("gallery.json")
     function render(index) {
       currentIndex = (index + paintings.length) % paintings.length;
       const painting = paintings[currentIndex];
+      const requestId = ++renderRequestId;
       resetZoom();
       lightboxImage.src = painting.file;
       lightboxImage.alt = painting.title || "";
-      const caption = painting.year
-        ? `${painting.title || ""}, ${painting.year}`.replace(/^, /, "")
-        : painting.title || "";
-      lightboxCaption.textContent = caption;
-      lightboxCaption.hidden = !caption;
+      updateCaption(painting, {});
+
+      fetchEmbeddedMetadata(painting.file).then((meta) => {
+        if (requestId !== renderRequestId) return;
+        updateCaption(painting, meta);
+      });
     }
 
     function openLightbox(index) {
