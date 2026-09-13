@@ -8,6 +8,8 @@ fetch("gallery.json")
     const lightboxImage = document.getElementById("lightbox-image");
     const lightboxCaption = document.getElementById("lightbox-caption");
     const lightboxClose = document.getElementById("lightbox-close");
+    const lightboxPrev = document.getElementById("lightbox-prev");
+    const lightboxNext = document.getElementById("lightbox-next");
 
     if (!paintings.length) {
       empty.hidden = false;
@@ -21,6 +23,7 @@ fetch("gallery.json")
 
     function applyTransform() {
       lightboxImage.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+      lightboxImage.classList.toggle("lightbox__image--zoomed", scale > 1);
     }
 
     function resetZoom() {
@@ -71,6 +74,8 @@ fetch("gallery.json")
     }
 
     lightboxClose.addEventListener("click", closeLightbox);
+    lightboxPrev.addEventListener("click", showPrev);
+    lightboxNext.addEventListener("click", showNext);
     lightbox.addEventListener("click", (event) => {
       if (event.target === lightbox) closeLightbox();
     });
@@ -195,6 +200,63 @@ fetch("gallery.json")
       if (Math.abs(deltaX) > SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY)) {
         if (deltaX < 0) showNext();
         else showPrev();
+      }
+    });
+
+    // Desktop equivalents: scroll/trackpad to zoom, click-drag to pan
+    // once zoomed, and double-click to toggle zoom.
+    let isMouseDown = false;
+    let mouseStartX = 0;
+    let mouseStartY = 0;
+
+    stage.addEventListener(
+      "wheel",
+      (event) => {
+        event.preventDefault();
+        scale = Math.min(Math.max(scale - event.deltaY * 0.01, 1), 4);
+        if (scale === 1) {
+          translateX = 0;
+          translateY = 0;
+        } else {
+          const limit = maxPan();
+          translateX = clamp(translateX, limit.x);
+          translateY = clamp(translateY, limit.y);
+        }
+        applyTransform();
+      },
+      { passive: false }
+    );
+
+    stage.addEventListener("mousedown", (event) => {
+      if (scale <= 1) return;
+      isMouseDown = true;
+      mouseStartX = event.clientX;
+      mouseStartY = event.clientY;
+      panStartX = translateX;
+      panStartY = translateY;
+      lightboxImage.classList.add("lightbox__image--panning");
+      event.preventDefault();
+    });
+
+    window.addEventListener("mousemove", (event) => {
+      if (!isMouseDown) return;
+      const limit = maxPan();
+      translateX = clamp(panStartX + (event.clientX - mouseStartX), limit.x);
+      translateY = clamp(panStartY + (event.clientY - mouseStartY), limit.y);
+      applyTransform();
+    });
+
+    window.addEventListener("mouseup", () => {
+      isMouseDown = false;
+      lightboxImage.classList.remove("lightbox__image--panning");
+    });
+
+    stage.addEventListener("dblclick", () => {
+      if (scale > 1) {
+        resetZoom();
+      } else {
+        scale = 2;
+        applyTransform();
       }
     });
 
