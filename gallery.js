@@ -66,7 +66,7 @@ fetch("gallery.json")
       }
       if (meta.description) {
         meta.description
-          .split("\n")
+          .split(/\r\n|\r|\n/)
           .map((line) => line.trim())
           .filter(Boolean)
           .forEach((line) => lines.push(line));
