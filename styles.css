@@ -43,11 +43,6 @@ html, body {
 .banner {
   background: var(--banner-bg);
   padding: max(env(safe-area-inset-top), 14px) 20px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px 16px;
 }
 
 .banner__title {
@@ -56,23 +51,8 @@ html, body {
   font-weight: 420;
   letter-spacing: 0.01em;
   color: var(--text-inverse);
+  text-align: center;
   text-wrap: balance;
-}
-
-.banner__nav {
-  font-size: 0.85rem;
-  color: var(--muted);
-  white-space: nowrap;
-}
-
-.banner__nav a {
-  color: var(--muted);
-  text-decoration: underline;
-}
-
-.banner__nav a:hover,
-.banner__nav a:focus-visible {
-  color: var(--text-inverse);
 }
 
 .content {

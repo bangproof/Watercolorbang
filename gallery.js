@@ -1,6 +1,4 @@
-const gallerySource = document.currentScript.dataset.source || "gallery.json";
-
-fetch(gallerySource)
+fetch("gallery.json")
   .then((response) => response.json())
   .then((paintings) => {
     const grid = document.getElementById("gallery-grid");
