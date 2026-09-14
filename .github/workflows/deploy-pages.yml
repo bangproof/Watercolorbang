@@ -24,8 +24,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Stamp deploy time and cache-bust assets
         run: |
-          sed -i "s/__BUILD_TIME__/$(TZ='America/New_York' date +'%Y-%m-%d %H:%M %Z')/" index.html
-          sed -i "s/__CACHE_BUST__/${GITHUB_SHA}/" index.html
+          sed -i "s/__BUILD_TIME__/$(TZ='America/New_York' date +'%Y-%m-%d %H:%M %Z')/" index.html sketchbook.html
+          sed -i "s/__CACHE_BUST__/${GITHUB_SHA}/" index.html sketchbook.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

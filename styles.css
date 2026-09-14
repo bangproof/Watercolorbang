@@ -43,7 +43,6 @@ html, body {
 .banner {
   background: var(--banner-bg);
   padding: max(env(safe-area-inset-top), 14px) 20px 12px;
-  border-bottom: 2px solid var(--accent);
 }
 
 .banner__title {
@@ -54,6 +53,23 @@ html, body {
   color: var(--text-inverse);
   text-align: center;
   text-wrap: balance;
+}
+
+.banner__nav {
+  margin-top: 4px;
+  text-align: center;
+}
+
+.banner__nav a {
+  color: var(--accent);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+}
+
+.banner__nav a:hover,
+.banner__nav a:focus-visible {
+  text-decoration: underline;
 }
 
 .content {
