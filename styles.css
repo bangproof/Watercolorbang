@@ -41,9 +41,13 @@ html, body {
 }
 
 .banner {
-  position: relative;
   background: var(--banner-bg);
   padding: max(env(safe-area-inset-top), 14px) 20px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
 }
 
 .banner__title {
@@ -52,16 +56,13 @@ html, body {
   font-weight: 420;
   letter-spacing: 0.01em;
   color: var(--text-inverse);
-  text-align: center;
   text-wrap: balance;
 }
 
 .banner__nav {
-  position: absolute;
-  top: max(env(safe-area-inset-top), 14px);
-  right: 20px;
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 .banner__nav a {
