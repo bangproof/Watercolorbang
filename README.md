@@ -1,17 +1,12 @@
 # watercolorbang
 
-Source for [bangproof.github.io/Watercolorbang](https://bangproof.github.io/Watercolorbang/). Plain HTML/CSS, deployed automatically to GitHub Pages on every push to `main`.
+Source for [bangproof.github.io/Watercolorbang](https://bangproof.github.io/Watercolorbang/). Plain HTML/CSS/JS, deployed automatically to GitHub Pages on every push to `main`.
 
-## Adding a painting
+## Adding a painting or sketch
 
-1. Upload the scanned image into the `images/` folder (GitHub web or app: **Add file → Upload files**).
-2. Open `gallery.json` and add an entry for it:
+1. Upload the scanned image into `images/` for paintings, or `images/sketches/` for sketches (GitHub web or app: **Add file → Upload files**).
+2. Commit the change. That's it — the deploy workflow scans both folders and regenerates `gallery.json`/`sketches.json` automatically, newest file first (by filename, `yy-mmdd...` sorts correctly). The site rebuilds within a minute or two.
 
-   ```json
-   { "file": "images/your-file-name.jpg", "title": "Painting Title", "year": 2026 }
-   ```
+Each image's caption is read automatically from its embedded metadata (Photoshop's File Info → Description field, saved via **Save As** with metadata included — "Export As" tends to strip it). No manual captioning needed; a file with no embedded description just shows no caption.
 
-   `title` and `year` are optional — leave them out if you don't want a caption.
-3. Commit the change. The site rebuilds automatically within a minute or two.
-
-Newest paintings should go at the top of the `gallery.json` array; the gallery displays them in that order.
+`gallery.json` and `sketches.json` in the repo are build output, not something to hand-edit — they're overwritten on every deploy to match whatever is actually in `images/`.

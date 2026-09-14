@@ -22,6 +22,33 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Generate gallery manifests from images/ and images/sketches/
+        run: |
+          python3 <<'PY'
+          import json
+          import os
+
+          def render(dir_path, out_path):
+              files = sorted(
+                  (
+                      f
+                      for f in os.listdir(dir_path)
+                      if f.lower().endswith((".jpg", ".jpeg"))
+                      and os.path.isfile(os.path.join(dir_path, f))
+                  ),
+                  reverse=True,
+              )
+              lines = [
+                  '  { "file": %s }' % json.dumps(f"{dir_path}/{f}", ensure_ascii=False)
+                  for f in files
+              ]
+              body = ",\n".join(lines)
+              with open(out_path, "w") as out:
+                  out.write("[\n" + body + "\n]\n" if lines else "[]\n")
+
+          render("images", "gallery.json")
+          render("images/sketches", "sketches.json")
+          PY
       - name: Stamp deploy time and cache-bust assets
         run: |
           sed -i "s/__BUILD_TIME__/$(TZ='America/New_York' date +'%Y-%m-%d %H:%M %Z')/" index.html sketchbook.html
